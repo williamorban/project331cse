@@ -14,15 +14,6 @@ with open(csvFile, "r") as csvFile:
     for row in csvReader:
         rows.append(row)
 
-"""while True:
-    stateSelect=input(f"\n\n\nState: ")
-    if len(stateSelect) > 2: #conditional that checks state entry
-        print(f"It looks like you're selection of '{stateSelect.upper()}' was invalid as it was {len(stateSelect)} characters long. Please only enter in 2-character US state identification codes. ")
-    elif stateSelect.upper() not in stateList:
-        print(f"It looks like your slection of '{stateSelect.upper()}' was invalid. Please only enter in 2-character US state identification codes.")
-    else:
-        break"""
-
 results=[]
 
 
@@ -75,10 +66,6 @@ def citySearch():
             print(f"It looks like your selection of '{city.upper()}' was not in the state you searched for, '{state.upper()}'.")
     navigation(2)
     return cityResults
-
-"""print(f"Enter the corresponding number to go the the respective part of the program:")
-print(f"[0] : Home\n[1] : Search by state.\n[2] : Search by city")"""
-
 
 def navigation(stage):
     print(f"Enter the corresponding number to go the the respective part of the program:")

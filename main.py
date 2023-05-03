@@ -103,22 +103,24 @@ def login(): #user logs in.
         print(f"Account not found. Loginuser: {loginUser}")
 
     
-while True:
-    pullAccountList()
-    print("\n\nWelcome to Super Spiffy Ultra-Cool College Wishlist!\n\nPlease create an account or login by entering the corresponding number associated with an action.")
-    accountAction=input(f"\nCreate Account: 1\nLogin: 2\n\nSelection: ")
-
-
-    if accountAction == "1":
-        createAccount()
-        print(f"\n\nPlease login: \n")
+def goHome():
+    while True:
         pullAccountList()
-        login()
-        break
-    elif accountAction == "2":
-        login()
-        break
-    else:
-        print(f"\nInvalid Selection, please Try again:")
+        print("\n\nWelcome to Super Spiffy Ultra-Cool College Wishlist!\n\nPlease create an account or login by entering the corresponding number associated with an action.")
+        accountAction=input(f"\nCreate Account: 1\nLogin: 2\n\nSelection: ")
+
+
+        if accountAction == "1":
+            createAccount()
+            print(f"\n\nPlease login: \n")
+            pullAccountList()
+            login()
+            break
+        elif accountAction == "2":
+            login()
+            break
+        else:
+            print(f"\nInvalid Selection, please Try again:")
+goHome()
 
 #END OF LOGIN
