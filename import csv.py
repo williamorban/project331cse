@@ -1,5 +1,4 @@
 import csv
-
 csvFile="/Volumes/WMO32/CSE/Project 331/privAssets/unis.csv" #mac
 #csvFile=r"E:\CSE\Project 331\privAssets\saltFile.txt" #windows
 stateList=[ 'AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA',
@@ -16,7 +15,18 @@ with open(csvFile, "r") as csvFile:
 
 results=[]
 
-
+def select(list: list):
+    selectionList=[]
+    while True:
+        number=int(input(f"Please enter the number in brackets next to the institution you would like to select."))
+        if number > len(list) or number < 0:
+            print(f"Your selection, '{number}' was not found.")
+        else:
+            selection = list[number]
+            print(f"You selected '{selection[0]} in {selection[1]},{selection[2]}.'")
+            selectionList.append(selection)
+            break
+    return selectionList
 
 def enterState(): #procedure for user entering state
     while True:
@@ -31,8 +41,8 @@ def enterState(): #procedure for user entering state
             return state
         
 def stateSearch(state, mode: int):
-    count = 1
     stateList=[]
+    count=0
     if mode == 1:
         for uni in rows:
             if uni[2]==str(state).upper():
@@ -48,11 +58,11 @@ def stateSearch(state, mode: int):
                 stateList.append(uni)
         return stateList
 
-def citySearch():
+def citySearch(): #issue where, when generating city colleges to choose from, all options are duplicated. is likely due to the fact that the program proceeds throught the normal state search and then something else. 
     state=enterState()
     stateList=stateSearch(state,2)
     cityResults=[]
-    count = 1
+    count = 0
     city = input(f"\n\n\nCity:")
     for uni in stateList:
         if city.upper() in uni[1]:
@@ -64,6 +74,7 @@ def citySearch():
             print(f"[{count}] : {cityUni[0]} in {cityUni[1]},{cityUni[2]}")
         elif city.upper() not in cityUni[1]:
             print(f"It looks like your selection of '{city.upper()}' was not in the state you searched for, '{state.upper()}'.")
+    select(cityResults)
     navigation(2)
     return cityResults
 
