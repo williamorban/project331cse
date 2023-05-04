@@ -1,7 +1,7 @@
 import csv
 
-#csvFile="/Volumes/WMO32/CSE/Project 331/privAssets/unis.csv" #mac
-csvFile=r"E:\CSE\Project 331\privAssets\unis.csv" #windows
+csvFile="/Volumes/WMO32/CSE/Project 331/privAssets/unis.csv" #mac
+#csvFile=r"E:\CSE\Project 331\privAssets\unis.csv" #windows
 stateList=[ 'AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA',
            'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME',
            'MI', 'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM',
@@ -59,7 +59,7 @@ def stateSearch(state, mode: int):
                 stateList.append(uni)
         return stateList
 
-def citySearch(): #issue where, when generating city colleges to choose from, all options are duplicated. is likely due to the fact that the program proceeds throught the normal state search and then something else. 
+def citySearch(): #ISSUE RESOLVED issue where, when generating city colleges to choose from, all options are duplicated. is likely due to the fact that the program proceeds throught the normal state search and then something else. 
     state=enterState()
     stateList=stateSearch(state,2)
     cityResults=[]
@@ -70,17 +70,13 @@ def citySearch(): #issue where, when generating city colleges to choose from, al
             print(f"[{count}] : {uni[0]} in {uni[1]},{uni[2]}")
             count+=1
             cityResults.append(uni)
-    for cityUni in cityResults:
-        if city.upper() in cityUni[1]:
-            print(f"[{count}] : {cityUni[0]} in {cityUni[1]},{cityUni[2]}")
-        elif city.upper() not in cityUni[1]:
-            print(f"It looks like your selection of '{city.upper()}' was not in the state you searched for, '{state.upper()}'.")
-    #select(cityResults)
+
+    select(cityResults)
     navigation(2)
     return cityResults
 
 def navigation(stage):
-    print(f"Enter the corresponding number to go the the respective part of the program:")
+    print(f"\n\nEnter the corresponding number to go the the respective part of the program:")
     if stage==1:
         print(f"[0] : Home\n")
         navSelection=input(f"Selection: ")
