@@ -67,8 +67,11 @@ def createAccount(): #creates a user account
 
                 if checkPassword==password: #if password matches and is confirmed, then backend assets are created.
                     fileName=f"{fname.lower()}{lname.lower()}"
-                    open(f"{fileName}.json", "x")
-                    with open(f"{fileName}.json", "w") as outfile:
+                    open(f"/Volumes/WMO32/CSE/Project 331/privAssets/userLists/{fileName}.json", "x") #MAC FILE PATH
+                    #open(f"E:\CSE\Project 331\privAssets\userLists{fileName}.json", "x") #WINDOWS PATH
+                    with open(f"/Volumes/WMO32/CSE/Project 331/privAssets/userLists/{fileName}.json", "w") as outfile:# mac
+                    #with open(f"E:\CSE\Project 331\privAssets\userLists{fileName}.json", "w") as outfile: #WINDOWS VERSION
+
                         outfile.write("[\n\n]")
                     hashedPassword=hash(password, globalSalt)
                     print(f"Password set!") #confirmation message
@@ -151,55 +154,65 @@ with open(csvFile, "r") as csvFile:
 
 results=[]
 
+def exportSelection(selection):
+    uniExport = []
+    with open(f"/Volumes/WMO32/CSE/Project 331/privAssets/userLists/{uname}.json", "r") as outfile: #MAC VERSION
+    #with open(f"E:\CSE\Project 331\privAssets\userLists{uname}.json", "r") as outfile: #WINDOWS VERSION
+        uniExport = json.load(outfile)
+    uniNames=[]
+    for uniName in uniExport:
+        uniNames.append(uniName["uniName"])
+    if selection[0] not in uniNames: #if selection is not already exported
+        uniExport.append(
+            {
+                "uniName":selection[0],
+                "uniCity":selection[1],
+                "uniState":selection[2]
+            }
+        )
+    else:
+        print(f"It looks like you have already saved this university to your list.")
+        #ADD WHILE LOOP/BREAK THING ONCE YOU GET YOUR NAVIGATION STRAIGHT
+
+    with open(f"/Volumes/WMO32/CSE/Project 331/privAssets/userLists/{uname}.json", 'w') as json_file: #MAC VERSION
+    #with open(f"E:\CSE\Project 331\privAssets\userLists{fileName}.json{uname}.json", 'w') as json_file: #WINDOWS VERSION
+        json.dump(uniExport, json_file, indent=4)
+    while True:
+        again=int(input(f"Would you like to select another university to add to your list? Enter the number in brackets next to your response:\n[0] : No\n[1] : Yes\n Selection:    "))
+        if again == 0:
+            print(f"Ending selection...")
+            select = False
+            break
+        elif again == 1:
+            print(f"Repeating selction process...")
+            select = True
+            numCheck=False
+            break
+        else:
+            print(f"It looks like your response of '{again.upper()}' was not recognized. Please try again.")
+        
 
 def select(list: list):
     selectionList=[]
     select=True
+    numCheck=False
     while select == True:
-        number=int(input(f"Please enter the number in brackets next to the institution you would like to select."))
-        if number > len(list) or number < 0:
-            print(f"Your selection, '{number}' was not found.")
-        else:
-            selection = list[number]
-            uniFormatted=f"{selection[0]} in {selection[1]}, {selection[2]}"
-            print(f"You selected '{uniFormatted}.'")
-            selectionList.append(selection)
-            """with open(f"{uname}.json", "w") as outfile:
-                outfile.writelines(uniFormatted)"""
-
-        uniExport = []
-        with open(f"{uname}.json", "r") as outfile:
-            uniExport = json.load(outfile)
-        uniNames=[]
-        for uniName in uniExport:
-            uniNames.append(uniName["uniName"])
-        if selection[0] not in uniNames: #if selection is not already exported
-            uniExport.append(
-                {
-                    "uniName":selection[0],
-                    "uniCity":selection[1],
-                    "uniState":selection[2]
-                }
-            )
-        else:
-            print(f"It looks like you have already saved this university to your list.")
-            #ADD WHILE LOOP/BREAK THING ONCE YOU GET YOUR NAVIGATION STRAIGHT
-
-        with open(f"{uname}.json", 'w') as json_file:
-            json.dump(uniExport, json_file, indent=4)
-        while True:
-            again=int(input(f"Would you like to select another university to add to your list? Enter the number in brackets next to your response:\n[0] : No\n[1] : Yes\n Selection:    "))
-            if again == 0:
-                print(f"Ending selection...")
-                select = False
+        while numCheck==False:
+            number=input(f"Please enter the number in brackets next to the institution you would like to select. If you would not like to select any institution mentioned, enter, 'x'.").lower()
+            if number == "x":
+                print(f"Exiting...")
+                select=False
+                numCheck=True
                 break
-            elif again == 1:
-                print(f"Repeating selction process...")
-                select = True
-                break
+            elif int(number) > len(list) or int(number) < 0:
+                print(f"Your selection, '{number}' was not found.")
+                numCheck=False #number not found, will ask again
             else:
-                print(f"It looks like your response of '{again.upper()}' was not recognized. Please try again.")
-        
+                selection = list[int(number)]
+                uniFormatted=f"{selection[0]} in {selection[1]}, {selection[2]}"
+                print(f"You selected '{uniFormatted}.'")
+                selectionList.append(selection)
+                exportSelection(selection)
     return selectionList
 
 def enterState(): #procedure for user entering state
@@ -234,19 +247,22 @@ def stateSearch(state, mode: int):
 
 def citySearch(): #ISSUE RESOLVED issue where, when generating city colleges to choose from, all options are duplicated. is likely due to the fact that the program proceeds throught the normal state search and then something else. 
     state=enterState()
-    stateList=stateSearch(state,2)
-    cityResults=[]
-    count = 0
-    city = input(f"\n\n\nCity:")
-    for uni in stateList:
-        if city.upper() in uni[1]:
-            print(f"[{count}] : {uni[0]} in {uni[1]},{uni[2]}")
-            count+=1
-            cityResults.append(uni)
-            break
-        elif city.upper() not in uni[1] and stateList.index(uni)==len(stateList)-1:
-            print(f"\n\nIt looks like your city selection of '{city.upper()}' did not warrant any results. Please try again. ")
-            city = input(f"\nCity:")
+    citySearching=True
+    while citySearching==True:
+        stateList=stateSearch(state,2)
+        cityResults=[]
+        count = 0
+        city = input(f"\n\n\nCity:")
+        for uni in stateList:
+            if city.upper() in uni[1]:
+                print(f"[{count}] : {uni[0]} in {uni[1]},{uni[2]}")
+                count+=1
+                cityResults.append(uni)
+                citySearching=False
+                break
+            elif city.upper() not in uni[1] and stateList.index(uni)==len(stateList)-1:
+                print(f"\n\nIt looks like your city selection of '{city.upper()}' did not warrant any results. Please try again. ")
+                citySearching=True
 
     select(cityResults)
     navigation(2)
