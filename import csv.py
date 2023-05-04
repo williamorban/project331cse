@@ -1,6 +1,7 @@
 import csv
-csvFile="/Volumes/WMO32/CSE/Project 331/privAssets/unis.csv" #mac
-#csvFile=r"E:\CSE\Project 331\privAssets\saltFile.txt" #windows
+
+#csvFile="/Volumes/WMO32/CSE/Project 331/privAssets/unis.csv" #mac
+csvFile=r"E:\CSE\Project 331\privAssets\unis.csv" #windows
 stateList=[ 'AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA',
            'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME',
            'MI', 'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM',
@@ -74,7 +75,7 @@ def citySearch(): #issue where, when generating city colleges to choose from, al
             print(f"[{count}] : {cityUni[0]} in {cityUni[1]},{cityUni[2]}")
         elif city.upper() not in cityUni[1]:
             print(f"It looks like your selection of '{city.upper()}' was not in the state you searched for, '{state.upper()}'.")
-    select(cityResults)
+    #select(cityResults)
     navigation(2)
     return cityResults
 
