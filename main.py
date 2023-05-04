@@ -66,7 +66,9 @@ def createAccount(): #creates a user account
 
                 if checkPassword==password: #if password matches and is confirmed, then backend assets are created.
                     fileName=f"{fname.lower()}{lname.lower()}"
-                    open(f"{fileName}.txt", "x")
+                    with open(f"{fileName}.json", "x") as outfile:
+                        outfile.write([])
+
                     hashedPassword=hash(password, globalSalt)
                     print(f"Password set!") #confirmation message
                     jsonExport(fname, lname, removeByteMark(str(hashedPassword))) #exports account data to accountData.json, byte data removed from hash.
