@@ -1,0 +1,17 @@
+[
+    {
+        "uniName": "CORNELL UNIVERSITY",
+        "uniCity": "ITHACA",
+        "uniState": "NY"
+    },
+    {
+        "uniName": "HARVARD UNIVERSITY",
+        "uniCity": "CAMBRIDGE",
+        "uniState": "MA"
+    },
+    {
+        "uniName": "MASSACHUSETTS INSTITUTE OF TECHNOLOGY",
+        "uniCity": "CAMBRIDGE",
+        "uniState": "MA"
+    }
+]
