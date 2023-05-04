@@ -27,6 +27,7 @@ def select(list: list):
             print(f"You selected '{selection[0]} in {selection[1]},{selection[2]}.'")
             selectionList.append(selection)
             break
+        
     return selectionList
 
 def enterState(): #procedure for user entering state
@@ -47,7 +48,6 @@ def stateSearch(state, mode: int):
     if mode == 1:
         for uni in rows:
             if uni[2]==str(state).upper():
-                results.append(uni[0])
                 print(f"[{count}] : {uni[0]} in {uni[1]},{uni[2]}")
                 count+=1
                 stateList.append(uni)

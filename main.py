@@ -8,6 +8,7 @@ Ryan Grund & Wiliam Orban
 import json, bcrypt
 accountList=None
 activeAccounts=[]
+uname=None
 #jsonPath=r'E:\CSE\Project 331\privAssets\accountData.json' #windows
 jsonPath=r'/Volumes/WMO32/CSE/Project 331/privAssets/accountData.json' #mac
 #saltFile=open('E:\CSE\Project 331\privAssets\saltFile.txt', "r") #windows
@@ -66,9 +67,9 @@ def createAccount(): #creates a user account
 
                 if checkPassword==password: #if password matches and is confirmed, then backend assets are created.
                     fileName=f"{fname.lower()}{lname.lower()}"
-                    with open(f"{fileName}.json", "x") as outfile:
-                        outfile.write([])
-
+                    open(f"{fileName}.json", "x")
+                    with open(f"{fileName}.json", "w") as outfile:
+                        outfile.write("[\n\n]")
                     hashedPassword=hash(password, globalSalt)
                     print(f"Password set!") #confirmation message
                     jsonExport(fname, lname, removeByteMark(str(hashedPassword))) #exports account data to accountData.json, byte data removed from hash.
@@ -82,27 +83,32 @@ def createAccount(): #creates a user account
 
 
 def login(): #user logs in.
-    print(f"Please enter your name and password to login successfully.")
-    fname=input(f"First name: ").lower()
-    lname=input(f"Last name: ").lower()
-    loginUser=f"{fname}{lname}"
-    if loginUser in activeAccounts: #if user exists from pullAccount()
-        while True: 
-            jsonData=json.load(open(jsonPath))
-            for user in jsonData:
-                if user["uname"] == loginUser:
-                    userFileHash=user["password"] #pulls hash from loginUser's json data
-            loginPassword = input(f"Password: ")
-            if hash(loginPassword, globalSalt) == bytes(userFileHash, "utf-8)"): #conditional checks to see if hashed passwords match, if they do, login is sucessful and login funciton breaks
-                print(f"Login successful!\n\nWelcome, {fname}.")
-                break
-            elif hash(loginPassword, globalSalt) != bytes(userFileHash, "utf-8)"):
-                print(f"Login failed. ")
-            else:
-                print(f"Unexpected error")
-                break
-    else:
-        print(f"Account not found. Loginuser: {loginUser}")
+    login = False
+    while login == False:
+        print(f"Please enter your name and password to login successfully.")
+        fname=input(f"First name: ").lower()
+        lname=input(f"Last name: ").lower()
+        loginUser=f"{fname}{lname}"
+        global uname 
+        uname = f"{fname.lower()}{lname.lower()}"
+        if loginUser in activeAccounts: #if user exists from pullAccount()
+            while True: 
+                jsonData=json.load(open(jsonPath))
+                for user in jsonData:
+                    if user["uname"] == loginUser:
+                        userFileHash=user["password"] #pulls hash from loginUser's json data
+                loginPassword = input(f"Password: ")
+                if hash(loginPassword, globalSalt) == bytes(userFileHash, "utf-8)"): #conditional checks to see if hashed passwords match, if they do, login is sucessful and login funciton breaks
+                    print(f"Login successful!\n\nWelcome, {fname}.")
+                    login = True
+                    break
+                elif hash(loginPassword, globalSalt) != bytes(userFileHash, "utf-8)"):
+                    print(f"Login failed. ")
+                else:
+                    print(f"Unexpected error")
+                    break
+        else:
+            print(f"Account not found. Loginuser: {loginUser}")
 
     
 def goHome():
@@ -126,3 +132,127 @@ def goHome():
 goHome()
 
 #END OF LOGIN
+
+import csv
+
+csvFile="/Volumes/WMO32/CSE/Project 331/privAssets/unis.csv" #mac
+#csvFile=r"E:\CSE\Project 331\privAssets\unis.csv" #windows
+stateList=[ 'AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA',
+           'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME',
+           'MI', 'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM',
+           'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX',
+           'UT', 'VA', 'VT', 'WA', 'WI', 'WV', 'WY']
+cityList=[]
+rows=[]
+with open(csvFile, "r") as csvFile:
+    csvReader=csv.reader(csvFile)
+    for row in csvReader:
+        rows.append(row)
+
+results=[]
+def select(list: list):
+    selectionList=[]
+    while True:
+        number=int(input(f"Please enter the number in brackets next to the institution you would like to select."))
+        if number > len(list) or number < 0:
+            print(f"Your selection, '{number}' was not found.")
+        else:
+            selection = list[number]
+            uniFormatted=f"{selection[0]} in {selection[1]}, {selection[2]}"
+            print(f"You selected '{uniFormatted}.'")
+            selectionList.append(selection)
+            """with open(f"{uname}.json", "w") as outfile:
+                outfile.writelines(uniFormatted)"""
+
+
+
+
+        uniExport = []
+                
+        with open(f"{uname}.json", "r") as outfile:
+            uniExport = json.load(outfile)
+        uniExport.append(
+            {
+                "uniName":selection[0],
+                "uniCity":selection[1],
+                "uniState":selection[2]
+            }
+        )
+        print(uniExport)
+
+        """with open(jsonPath, 'w') as json_file:
+            json.dump(uniExport, json_file, indent=4)
+            break"""
+        
+    return selectionList
+
+def enterState(): #procedure for user entering state
+    while True:
+        state=input(f"\n\n\nState: ")
+        if len(state) > 2: #conditional that checks state entry
+            print(f"It looks like you're selection of '{state.upper()}' was invalid as it was {len(state)} characters long. Please only enter in 2-character US state identification codes. ")
+            state=None
+        elif state.upper() not in stateList:
+            print(f"It looks like your slection of '{state.upper()}' was invalid. Please only enter in 2-character US state identification codes.")
+            state=None
+        else:
+            return state
+        
+def stateSearch(state, mode: int):
+    stateList=[]
+    count=0
+    if mode == 1:
+        for uni in rows:
+            if uni[2]==str(state).upper():
+                print(f"[{count}] : {uni[0]} in {uni[1]},{uni[2]}")
+                count+=1
+                stateList.append(uni)
+        navigation(2)
+        return stateList
+    elif mode == 2:
+        for uni in rows:
+            if uni[2]==str(state).upper():
+                stateList.append(uni)
+        return stateList
+
+def citySearch(): #ISSUE RESOLVED issue where, when generating city colleges to choose from, all options are duplicated. is likely due to the fact that the program proceeds throught the normal state search and then something else. 
+    state=enterState()
+    stateList=stateSearch(state,2)
+    cityResults=[]
+    count = 0
+    city = input(f"\n\n\nCity:")
+    for uni in stateList:
+        if city.upper() in uni[1]:
+            print(f"[{count}] : {uni[0]} in {uni[1]},{uni[2]}")
+            count+=1
+            cityResults.append(uni)
+            break
+        elif city.upper() not in uni[1] and stateList.index(uni)==len(stateList)-1:
+            print(f"\n\nIt looks like your city selection of '{city.upper()}' did not warrant any results. Please try again. ")
+            city = input(f"\nCity:")
+
+    select(cityResults)
+    navigation(2)
+    return cityResults
+
+def navigation(stage):
+    print(f"\n\nEnter the corresponding number to go the the respective part of the program:")
+    if stage==1:
+        print(f"[0] : Home\n")
+        navSelection=input(f"Selection: ")
+        match int(navSelection):
+            case 0:
+                print(f"goHome")
+    elif stage==2:
+        print(f"[0] : Home\n[1] : Search by state.\n[2] : Search by city")
+        navSelection=input(f"Selection: ")
+        match int(navSelection):
+            case 0:
+                #goHome()
+                print(f"GoHome()")
+            case 1:
+                stateSearch(enterState(),1)
+            case 2:
+                citySearch()
+
+stateSearch(enterState,1)
