@@ -2,7 +2,7 @@
 Project 331
 CSE
 Ms. Koelm
-Ryan Grund & Wiliam Orban
+Ryan Grund, CLI crook & Wiliam Orban, vetted json wizard
 1st Hour
 """
 import json, bcrypt
@@ -150,9 +150,12 @@ with open(csvFile, "r") as csvFile:
         rows.append(row)
 
 results=[]
+
+
 def select(list: list):
     selectionList=[]
-    while True:
+    select=True
+    while select == True:
         number=int(input(f"Please enter the number in brackets next to the institution you would like to select."))
         if number > len(list) or number < 0:
             print(f"Your selection, '{number}' was not found.")
@@ -164,25 +167,38 @@ def select(list: list):
             """with open(f"{uname}.json", "w") as outfile:
                 outfile.writelines(uniFormatted)"""
 
-
-
-
         uniExport = []
-                
         with open(f"{uname}.json", "r") as outfile:
             uniExport = json.load(outfile)
-        uniExport.append(
-            {
-                "uniName":selection[0],
-                "uniCity":selection[1],
-                "uniState":selection[2]
-            }
-        )
-        print(uniExport)
+        uniNames=[]
+        for uniName in uniExport:
+            uniNames.append(uniName["uniName"])
+        if selection[0] not in uniNames: #if selection is not already exported
+            uniExport.append(
+                {
+                    "uniName":selection[0],
+                    "uniCity":selection[1],
+                    "uniState":selection[2]
+                }
+            )
+        else:
+            print(f"It looks like you have already saved this university to your list.")
+            #ADD WHILE LOOP/BREAK THING ONCE YOU GET YOUR NAVIGATION STRAIGHT
 
-        """with open(jsonPath, 'w') as json_file:
+        with open(f"{uname}.json", 'w') as json_file:
             json.dump(uniExport, json_file, indent=4)
-            break"""
+        while True:
+            again=int(input(f"Would you like to select another university to add to your list? Enter the number in brackets next to your response:\n[0] : No\n[1] : Yes\n Selection:    "))
+            if again == 0:
+                print(f"Ending selection...")
+                select = False
+                break
+            elif again == 1:
+                print(f"Repeating selction process...")
+                select = True
+                break
+            else:
+                print(f"It looks like your response of '{again.upper()}' was not recognized. Please try again.")
         
     return selectionList
 
@@ -207,6 +223,7 @@ def stateSearch(state, mode: int):
                 print(f"[{count}] : {uni[0]} in {uni[1]},{uni[2]}")
                 count+=1
                 stateList.append(uni)
+        select(stateList)
         navigation(2)
         return stateList
     elif mode == 2:
@@ -242,7 +259,8 @@ def navigation(stage):
         navSelection=input(f"Selection: ")
         match int(navSelection):
             case 0:
-                print(f"goHome")
+                goHome()
+                #ADD LOGOUT FUNCTIONALITY
     elif stage==2:
         print(f"[0] : Home\n[1] : Search by state.\n[2] : Search by city")
         navSelection=input(f"Selection: ")
@@ -255,4 +273,4 @@ def navigation(stage):
             case 2:
                 citySearch()
 
-stateSearch(enterState,1)
+navigation(2)
