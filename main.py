@@ -9,8 +9,13 @@ import json, bcrypt
 accountList=None
 activeAccounts=[]
 uname=None
-#jsonPath=r'E:\CSE\Project 331\privAssets\accountData.json' #windows
 jsonPath=r'/Volumes/WMO32/CSE/Project 331/privAssets/accountData.json' #mac
+#jsonPath=r'E:\CSE\Project 331\privAssets\accountData.json' #windows
+unameFP=None
+csvFile="/Volumes/WMO32/CSE/Project 331/privAssets/unis.csv" #mac
+#csvFile=r"E:\CSE\Project 331\privAssets\unis.csv" #windows
+
+
 #saltFile=open('E:\CSE\Project 331\privAssets\saltFile.txt', "r") #windows
 saltFile=open('/Volumes/WMO32/CSE/Project 331/privAssets/saltFile.txt', "r") #mac
 globalSalt=bytes(saltFile.readline(), "utf-8")
@@ -51,12 +56,16 @@ def jsonExport(fname, lname, hashedPassword): #creates user dictionary to be sav
             json.dump(listObj, json_file, indent=4)
 
 def createAccount(): #creates a user account
+    global unameFP, uname
     print(f"Please enter the following information as it is presented to create your account.")
     while True:
 
         fname=input(f"First name: ").lower()
         lname=input(f"Last name: ").lower()
-        if f"{fname}{lname}" in activeAccounts: #if user already exists, redirects to login.
+        uname=f"{fname.lower()}{lname.lower()}"
+        unameFP=f"/Volumes/WMO32/CSE/Project 331/privAssets/userLists/{uname}.json" #mac
+        #unameFP=f"E:\CSE\Project 331\privAssets\userLists\{uname}.json" #windows
+        if uname in activeAccounts: #if user already exists, redirects to login.
             print(f"\nIt looks like the username you have entered is already associated with another account. Proceeding to login... ")
             break
         else: #otherwise, account setup proceeds
@@ -66,11 +75,9 @@ def createAccount(): #creates a user account
                 checkPassword=input(f"Please reenter your password: ")
 
                 if checkPassword==password: #if password matches and is confirmed, then backend assets are created.
-                    fileName=f"{fname.lower()}{lname.lower()}"
-                    open(f"/Volumes/WMO32/CSE/Project 331/privAssets/userLists/{fileName}.json", "x") #MAC FILE PATH
-                    #open(f"E:\CSE\Project 331\privAssets\userLists{fileName}.json", "x") #WINDOWS PATH
-                    with open(f"/Volumes/WMO32/CSE/Project 331/privAssets/userLists/{fileName}.json", "w") as outfile:# mac
-                    #with open(f"E:\CSE\Project 331\privAssets\userLists{fileName}.json", "w") as outfile: #WINDOWS VERSION
+                    uname=f"{fname.lower()}{lname.lower()}"
+                    open(unameFP, "x") #WINDOWS PATH
+                    with open(unameFP, "w") as outfile: #WINDOWS VERSION
 
                         outfile.write("[\n\n]")
                     hashedPassword=hash(password, globalSalt)
@@ -86,20 +93,22 @@ def createAccount(): #creates a user account
 
 
 def login(): #user logs in.
+    global unameFP, uname
     login = False
+    global uname
     while login == False:
         print(f"Please enter your name and password to login successfully.")
         fname=input(f"First name: ").lower()
         lname=input(f"Last name: ").lower()
-        loginUser=f"{fname}{lname}"
-        global uname 
         uname = f"{fname.lower()}{lname.lower()}"
-        if loginUser in activeAccounts: #if user exists from pullAccount()
+        unameFP=f"/Volumes/WMO32/CSE/Project 331/privAssets/userLists/{uname}.json" #mac
+        #unameFP=f"E:\CSE\Project 331\privAssets\userLists\{uname}.json" #windows
+        if uname in activeAccounts: #if user exists from pullAccount()
             while True: 
                 jsonData=json.load(open(jsonPath))
                 for user in jsonData:
-                    if user["uname"] == loginUser:
-                        userFileHash=user["password"] #pulls hash from loginUser's json data
+                    if user["uname"] == uname:
+                        userFileHash=user["password"] #pulls hash from uname's json data
                 loginPassword = input(f"Password: ")
                 if hash(loginPassword, globalSalt) == bytes(userFileHash, "utf-8)"): #conditional checks to see if hashed passwords match, if they do, login is sucessful and login funciton breaks
                     print(f"Login successful!\n\nWelcome, {fname}.")
@@ -111,7 +120,7 @@ def login(): #user logs in.
                     print(f"Unexpected error")
                     break
         else:
-            print(f"Account not found. Loginuser: {loginUser}")
+            print(f"Account not found. Loginuser: {uname}")
 
     
 def goHome():
@@ -138,8 +147,7 @@ goHome()
 
 import csv
 
-csvFile="/Volumes/WMO32/CSE/Project 331/privAssets/unis.csv" #mac
-#csvFile=r"E:\CSE\Project 331\privAssets\unis.csv" #windows
+
 stateList=[ 'AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA',
            'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME',
            'MI', 'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM',
@@ -155,9 +163,9 @@ with open(csvFile, "r") as csvFile:
 results=[]
 
 def exportSelection(selection):
+    global uname
     uniExport = []
-    with open(f"/Volumes/WMO32/CSE/Project 331/privAssets/userLists/{uname}.json", "r") as outfile: #MAC VERSION
-    #with open(f"E:\CSE\Project 331\privAssets\userLists{uname}.json", "r") as outfile: #WINDOWS VERSION
+    with open(unameFP, "r") as outfile: #WINDOWS VERSION
         uniExport = json.load(outfile)
     uniNames=[]
     for uniName in uniExport:
@@ -174,22 +182,8 @@ def exportSelection(selection):
         print(f"It looks like you have already saved this university to your list.")
         #ADD WHILE LOOP/BREAK THING ONCE YOU GET YOUR NAVIGATION STRAIGHT
 
-    with open(f"/Volumes/WMO32/CSE/Project 331/privAssets/userLists/{uname}.json", 'w') as json_file: #MAC VERSION
-    #with open(f"E:\CSE\Project 331\privAssets\userLists{fileName}.json{uname}.json", 'w') as json_file: #WINDOWS VERSION
+    with open(unameFP, 'w') as json_file: 
         json.dump(uniExport, json_file, indent=4)
-    while True:
-        again=int(input(f"Would you like to select another university to add to your list? Enter the number in brackets next to your response:\n[0] : No\n[1] : Yes\n Selection:    "))
-        if again == 0:
-            print(f"Ending selection...")
-            select = False
-            break
-        elif again == 1:
-            print(f"Repeating selction process...")
-            select = True
-            numCheck=False
-            break
-        else:
-            print(f"It looks like your response of '{again.upper()}' was not recognized. Please try again.")
         
 
 def select(list: list):
@@ -213,6 +207,20 @@ def select(list: list):
                 print(f"You selected '{uniFormatted}.'")
                 selectionList.append(selection)
                 exportSelection(selection)
+                while True:
+                    again=int(input(f"Would you like to select another university to add to your list? Enter the number in brackets next to your response:\n[0] : No\n[1] : Yes\n Selection:    "))
+                    if again == 0:
+                        print(f"Ending selection...")
+                        select = False
+                        numCheck= True
+                        break
+                    elif again == 1:
+                        print(f"Repeating selction process...")
+                        select = True
+                        numCheck=False
+                        break
+                    else:
+                        print(f"It looks like your response of '{again.upper()}' was not recognized. Please try again.")
     return selectionList
 
 def enterState(): #procedure for user entering state
