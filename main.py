@@ -95,7 +95,6 @@ def createAccount(): #creates a user account
 def login(): #user logs in.
     global unameFP, uname
     login = False
-    global uname
     while login == False:
         print(f"Please enter your name and password to login successfully.")
         fname=input(f"First name: ").lower()
@@ -192,7 +191,7 @@ def select(list: list):
     numCheck=False
     while select == True:
         while numCheck==False:
-            number=input(f"Please enter the number in brackets next to the institution you would like to select. If you would not like to select any institution mentioned, enter, 'x'.").lower()
+            number=input(f"Please enter the number in brackets next to the institution you would like to select to add to your list. If you would not like to select any institution mentioned, enter, 'x'.").lower()
             if number == "x":
                 print(f"Exiting...")
                 select=False
@@ -245,7 +244,7 @@ def stateSearch(state, mode: int):
                 count+=1
                 stateList.append(uni)
         select(stateList)
-        navigation(2)
+        navigation()
         return stateList
     elif mode == 2:
         for uni in rows:
@@ -273,28 +272,95 @@ def citySearch(): #ISSUE RESOLVED issue where, when generating city colleges to 
                 citySearching=True
 
     select(cityResults)
-    navigation(2)
+    navigation()
     return cityResults
 
-def navigation(stage):
-    print(f"\n\nEnter the corresponding number to go the the respective part of the program:")
-    if stage==1:
-        print(f"[0] : Home\n")
-        navSelection=input(f"Selection: ")
-        match int(navSelection):
-            case 0:
-                goHome()
-                #ADD LOGOUT FUNCTIONALITY
-    elif stage==2:
-        print(f"[0] : Home\n[1] : Search by state.\n[2] : Search by city")
-        navSelection=input(f"Selection: ")
-        match int(navSelection):
-            case 0:
-                #goHome()
-                print(f"GoHome()")
-            case 1:
-                stateSearch(enterState(),1)
-            case 2:
-                citySearch()
+def viewSaved(mode:int):
+    global unameFP, uname
+    count = 0
+    match mode:
+        case 1:
+            userSaved=[]
+            userData=json.load(open(unameFP, "r"))
+            for institution in userData:
+                count +=1
+                print(f"[{count}] : {institution['uniName']} in {institution['uniCity']}, {institution['uniState']}")
+                userSaved.append(institution)
+            print(f"\nYou have {count} institutions saved. ")
+            navigation()
+            return userSaved
+        case 2:
+            userSaved=[]
+            userData=json.load(open(unameFP, "r"))
+            for institution in userData:
+                print(f"[{count}] : {institution['uniName']} in {institution['uniCity']}, {institution['uniState']}")
+                count +=1
+                userSaved.append(institution)
+            return userSaved
 
-navigation(2)
+
+            
+
+def remove():
+    select=True
+    numCheck=False
+    userSaved=viewSaved(2)
+    while select == True:
+        while numCheck==False:
+            choice=input(f"Please enter the number in brackets next to the institution you would like to select to delete. If you would not like to select any institution mentioned, enter, 'x'.").lower()
+            if choice == "x":
+                print(f"Exiting...")
+                navigation()
+                select=False
+                numCheck=True
+                break
+            elif int(choice) > len(userSaved) or int(choice) < 0:
+                print(f"Your selection, '{choice}' was not found.")
+                numCheck=False #number not found, will ask again
+            else:
+                selection = userSaved[int(choice)]
+                uniFormatted=f"{selection['uniName']} in {selection['uniCity']}, {selection['uniState']}"
+                print(f"You selected '{uniFormatted}.'")
+                removeSelection(selection)
+                while True:
+                    again=int(input(f"Would you like to select another university to remove from your list? Enter the number in brackets next to your response:\n[0] : No\n[1] : Yes\n Selection:    "))
+                    if again == 0:
+                        print(f"Ending selection...")
+                        select = False
+                        numCheck= True
+                        break
+                    elif again == 1:
+                        print(f"Repeating deletion process...")
+                        userSaved=viewSaved(2)
+                        select = True
+                        numCheck=False
+                        break
+                    else:
+                        print(f"It looks like your response of '{again.upper()}' was not recognized. Please try again.")
+
+
+def removeSelection(selection):
+    with open(unameFP, "r") as jsonFile:
+        data=json.load(jsonFile)
+    data.remove(selection)
+    print(f"Data: {data}")
+    with open(unameFP, "w") as jsonFile2:
+        json.dump(data, jsonFile2, indent=4)
+
+def navigation():
+    print(f"\n\nEnter the corresponding number to go the the respective part of the program:\n\n")
+    print(f"[0] : Home\n[1] : Search by state.\n[2] : Search by city\n[3] : View saved institutions\n[4] : Delete an institution from your list")
+    navSelection=input(f"\n\nSelection: ")
+    match int(navSelection):
+        case 0:
+            goHome()
+        case 1:
+            stateSearch(enterState(),1)
+        case 2:
+            citySearch()
+        case 3:
+            viewSaved(1)
+        case 4:
+            remove()
+
+navigation()
