@@ -2,23 +2,25 @@
 Project 331
 CSE
 Ms. Koelm
-Ryan Grund, CLI crook & Wiliam Orban, vetted json wizard
+Ryan Grund & Wiliam Orban
 1st Hour
 """
 import json, bcrypt
-accountList=None
 activeAccounts=[]
 uname=None
-jsonPath=r'/Volumes/WMO32/CSE/Project 331/privAssets/accountData.json' #mac
-#jsonPath=r'E:\CSE\Project 331\privAssets\accountData.json' #windows
 unameFP=None
-csvFile="/Volumes/WMO32/CSE/Project 331/privAssets/unis.csv" #mac
+
+
+#jsonPath=r'/Volumes/WMO32/CSE/Project 331/privAssets/accountData.json' #mac
+#jsonPath=r'E:\CSE\Project 331\privAssets\accountData.json' #windows
+#csvFile="/Volumes/WMO32/CSE/Project 331/privAssets/unis.csv" #mac
 #csvFile=r"E:\CSE\Project 331\privAssets\unis.csv" #windows
 
 
 #saltFile=open('E:\CSE\Project 331\privAssets\saltFile.txt', "r") #windows
 saltFile=open('/Volumes/WMO32/CSE/Project 331/privAssets/saltFile.txt', "r") #mac
 globalSalt=bytes(saltFile.readline(), "utf-8")
+
 
 def hash(plainText, salt): #password hashing function
     bytePass=bytes(plainText, "utf-8")
@@ -191,7 +193,7 @@ def select(list: list):
     numCheck=False
     while select == True:
         while numCheck==False:
-            number=input(f"Please enter the number in brackets next to the institution you would like to select to add to your list. If you would not like to select any institution mentioned, enter, 'x'.").lower()
+            number=input(f"\nPlease enter the number in brackets next to the institution you would like to select to add to your list. If you would not like to select any institution mentioned, enter, 'x' : ").lower()
             if number == "x":
                 print(f"Exiting...")
                 select=False
@@ -203,11 +205,11 @@ def select(list: list):
             else:
                 selection = list[int(number)]
                 uniFormatted=f"{selection[0]} in {selection[1]}, {selection[2]}"
-                print(f"You selected '{uniFormatted}.'")
+                print(f"\n\nYou selected '{uniFormatted}.'\n\n")
                 selectionList.append(selection)
                 exportSelection(selection)
                 while True:
-                    again=int(input(f"Would you like to select another university to add to your list? Enter the number in brackets next to your response:\n[0] : No\n[1] : Yes\n Selection:    "))
+                    again=int(input(f"Would you like to select another university to add to your list? Enter the number in brackets next to your response:\n[0] : No\n[1] : Yes\nSelection:    "))
                     if again == 0:
                         print(f"Ending selection...")
                         select = False
@@ -252,25 +254,26 @@ def stateSearch(state, mode: int):
                 stateList.append(uni)
         return stateList
 
-def citySearch(): #ISSUE RESOLVED issue where, when generating city colleges to choose from, all options are duplicated. is likely due to the fact that the program proceeds throught the normal state search and then something else. 
-    state=enterState()
+def citySearch(): 
     citySearching=True
     while citySearching==True:
-        stateList=stateSearch(state,2)
         cityResults=[]
         count = 0
+        stateList=stateSearch(enterState(),2)
         city = input(f"\n\n\nCity:")
         for uni in stateList:
             if city.upper() in uni[1]:
                 print(f"[{count}] : {uni[0]} in {uni[1]},{uni[2]}")
                 count+=1
                 cityResults.append(uni)
+                #citySearching=False
+                #break
+            elif stateList.index(uni)==len(stateList)-1:
                 citySearching=False
                 break
-            elif city.upper() not in uni[1] and stateList.index(uni)==len(stateList)-1:
-                print(f"\n\nIt looks like your city selection of '{city.upper()}' did not warrant any results. Please try again. ")
-                citySearching=True
-
+        if cityResults==[]:
+            print(f"\n\nIt looks like your city selection of '{city.upper()}' did not warrant any results. Please try again. ")
+            citySearching=True    
     select(cityResults)
     navigation()
     return cityResults
@@ -307,7 +310,7 @@ def remove():
     userSaved=viewSaved(2)
     while select == True:
         while numCheck==False:
-            choice=input(f"Please enter the number in brackets next to the institution you would like to select to delete. If you would not like to select any institution mentioned, enter, 'x'.").lower()
+            choice=input(f"\nPlease enter the number in brackets next to the institution you would like to select to delete. If you would not like to select any institution mentioned, enter, 'x' : ").lower()
             if choice == "x":
                 print(f"Exiting...")
                 navigation()
@@ -320,17 +323,17 @@ def remove():
             else:
                 selection = userSaved[int(choice)]
                 uniFormatted=f"{selection['uniName']} in {selection['uniCity']}, {selection['uniState']}"
-                print(f"You selected '{uniFormatted}.'")
+                print(f"\n\nYou selected '{uniFormatted}.'\n\n")
                 removeSelection(selection)
                 while True:
-                    again=int(input(f"Would you like to select another university to remove from your list? Enter the number in brackets next to your response:\n[0] : No\n[1] : Yes\n Selection:    "))
+                    again=int(input(f"Would you like to select another university to remove from your list? Enter the number in brackets next to your response:\n[0] : No\n[1] : Yes\nSelection:    "))
                     if again == 0:
                         print(f"Ending selection...")
                         select = False
                         numCheck= True
                         break
                     elif again == 1:
-                        print(f"Repeating deletion process...")
+                        print(f"\nRepeating deletion process...\n")
                         userSaved=viewSaved(2)
                         select = True
                         numCheck=False
@@ -343,13 +346,12 @@ def removeSelection(selection):
     with open(unameFP, "r") as jsonFile:
         data=json.load(jsonFile)
     data.remove(selection)
-    print(f"Data: {data}")
     with open(unameFP, "w") as jsonFile2:
         json.dump(data, jsonFile2, indent=4)
 
 def navigation():
     print(f"\n\nEnter the corresponding number to go the the respective part of the program:\n\n")
-    print(f"[0] : Home\n[1] : Search by state.\n[2] : Search by city\n[3] : View saved institutions\n[4] : Delete an institution from your list")
+    print(f"[0] : Home\n[1] : Search by state\n[2] : Search by city\n[3] : View saved institutions\n[4] : Delete an institution from your list")
     navSelection=input(f"\n\nSelection: ")
     match int(navSelection):
         case 0:
