@@ -11,9 +11,9 @@ uname=None
 unameFP=None
 
 
-#jsonPath=r'/Volumes/WMO32/CSE/Project 331/privAssets/accountData.json' #mac
+jsonPath=r'/Volumes/WMO32/CSE/Project 331/privAssets/accountData.json' #mac
 #jsonPath=r'E:\CSE\Project 331\privAssets\accountData.json' #windows
-#csvFile="/Volumes/WMO32/CSE/Project 331/privAssets/unis.csv" #mac
+csvFile="/Volumes/WMO32/CSE/Project 331/privAssets/unis.csv" #mac
 #csvFile=r"E:\CSE\Project 331\privAssets\unis.csv" #windows
 
 
@@ -122,6 +122,7 @@ def login(): #user logs in.
                     break
         else:
             print(f"Account not found. Loginuser: {uname}")
+    navigation()
 
     
 def goHome():
@@ -142,8 +143,6 @@ def goHome():
             break
         else:
             print(f"\nInvalid Selection, please Try again:")
-goHome()
-
 #END OF LOGIN
 
 import csv
@@ -349,9 +348,14 @@ def removeSelection(selection):
     with open(unameFP, "w") as jsonFile2:
         json.dump(data, jsonFile2, indent=4)
 
+def logout():
+    global uname
+    print(f"Looged out. Thanks for stopping by, {uname}!")
+    uname=None
+
 def navigation():
     print(f"\n\nEnter the corresponding number to go the the respective part of the program:\n\n")
-    print(f"[0] : Home\n[1] : Search by state\n[2] : Search by city\n[3] : View saved institutions\n[4] : Delete an institution from your list")
+    print(f"[0] : Home\n[1] : Search by state\n[2] : Search by city\n[3] : View saved institutions\n[4] : Delete an institution from your list\n[5] : Logout\n[6] : Quit")
     navSelection=input(f"\n\nSelection: ")
     match int(navSelection):
         case 0:
@@ -364,5 +368,9 @@ def navigation():
             viewSaved(1)
         case 4:
             remove()
+        case 5:
+            logout()
+        case 6:
+            quit()
 
-navigation()
+goHome()
